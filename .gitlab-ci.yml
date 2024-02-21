@@ -1,0 +1,28 @@
+stages:
+  - lint
+  - test
+  - deploy
+  - docs
+
+# Change pip's cache directory to be inside the project directory since we can
+# only cache local items.
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+# Pip's cache doesn't store the python packages
+# https://pip.pypa.io/en/stable/reference/pip_install/#caching
+cache:
+  paths:
+    - .cache/pip
+
+# Pipelines are templated for ease of maintenance. Please see url for complete definitions:
+# https://gitlab.com/facultyai/templates/ci-templates
+include:
+  - project: 'facultyai/templates/ci-templates'
+    file: 'python-lint.yaml'
+  - project: 'facultyai/templates/ci-templates'
+    file: 'python-test.yaml'
+  - project: 'facultyai/templates/ci-templates'
+    file: 'python-package.yaml'
+  - project: 'facultyai/templates/ci-templates'
+    file: 'python-docs.yaml'
