@@ -24,5 +24,18 @@ include:
     file: 'python-test.yaml'
   - project: 'facultyai/templates/ci-templates'
     file: 'python-package.yaml'
-  - project: 'facultyai/templates/ci-templates'
-    file: 'python-docs.yaml'
+
+pages:
+    image: python:${PYTHON_VERSION}
+    stage: docs
+    script:
+      - pip install -U sphinx sphinx_rtd_theme
+      - pip install .
+      - make -C docs html
+      - mv build/sphinx/html/ public/
+    artifacts:
+      paths:
+      - public
+    only:
+      - tags
+      - master
