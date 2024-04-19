@@ -15,27 +15,11 @@ cache:
   paths:
     - .cache/pip
 
-# Pipelines are templated for ease of maintenance. Please see url for complete definitions:
+# Pipelines are templated for ease of maintenance. Originall from:
 # https://gitlab.com/facultyai/templates/ci-templates
+# Copied locally to enable pushing from non-faculty accounts.
 include:
-  - project: 'facultyai/templates/ci-templates'
-    file: 'python-lint.yaml'
-  - project: 'facultyai/templates/ci-templates'
-    file: 'python-test.yaml'
-  - project: 'facultyai/templates/ci-templates'
-    file: 'python-package.yaml'
-
-pages:
-    image: python:${PYTHON_VERSION}
-    stage: docs
-    script:
-      - pip install -U sphinx sphinx_rtd_theme
-      - pip install .
-      - make -C docs html
-      - mv build/sphinx/html/ public/
-    artifacts:
-      paths:
-      - public
-    only:
-      - tags
-      - master
+  - local: 'ci-templates/python-lint.yaml'
+  - local: 'ci-templates/python-test.yaml'
+  - local: 'ci-templates/python-package.yaml'
+  - local: 'ci-templates/python-pages.yaml'

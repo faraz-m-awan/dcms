@@ -1,0 +1,13 @@
+# This jobs pushes the package to artifactory, the internal package index, twine environments variables:
+# TWINE_REPOSITORY_URL, TWINE_USERNAME, TWINE_REPOSITORY are inherited from gitlab. To overwrite set the variables
+# in your CI/CD template.
+
+build-and-push:
+  only:
+    - tags
+  image: python:${PYTHON_VERSION}
+  stage: deploy
+  script:
+    - pip install twine
+    - python setup.py bdist_wheel
+    - twine upload dist/* --verbose
