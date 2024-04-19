@@ -9,6 +9,6 @@ pages:
   artifacts:
     paths:
       - public
-    only:
-      - tags
-      - master
+  only:
+    - tags
+    - master
