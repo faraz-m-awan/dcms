@@ -1,0 +1,6 @@
+{
+    "search_id":"pulsar serach id found on pulsar platform",
+    "start_date":"start date of search in form: year-month-dayThour:minute:secondZ",
+    "end_date":"end date of search in form: year-month-dayThour:minute:secondZ",
+    "query_variables":["list of pulsar api result query variables"]
+}
