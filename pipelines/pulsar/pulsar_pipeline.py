@@ -4,7 +4,7 @@ import json
 import math
 import os
 from datetime import datetime
-from typing import Generator
+from typing import Generator, List
 
 import pandas as pd
 from dotenv import load_dotenv
@@ -25,7 +25,7 @@ PULSAR_URL = "https://data.pulsarplatform.com/graphql/trac"
 PULSAR_API = os.environ.get("PULSAR_API_KEY")
 
 
-class PulsarClient:
+class _PulsarClient:
     _session: AsyncClientSession
 
     def __init__(self, session: AsyncClientSession):
@@ -128,6 +128,52 @@ class PulsarClient:
             (f"{fetched_pages} /{total_pages} collected, ")
 
 
+async def client(
+    search_id: str, start_date: str, end_date: str, query_variables: str, limit: int
+) -> List[dict]:
+    """client to get pulsar data
+
+    Parameters
+    ----------
+    search_id : str
+        pulsar_search_id
+    start_date : str
+        start date of query
+    end_date : str
+        end date of query
+    query_variables : str
+        list of variables to include
+    limit : int
+        limit
+
+    Returns
+    -------
+    List[dict]
+        pulsar results
+    """
+    transport = AIOHTTPTransport(
+        url=PULSAR_URL, headers={"Authorization": "Bearer {}".format(PULSAR_API)}
+    )
+
+    async with Client(
+        transport=transport,
+        fetch_schema_from_transport=False,
+    ) as session:
+        pulsar_client = _PulsarClient(session=session)
+        results = pulsar_client.get_posts(
+            search_id=search_id,
+            start=start_date,
+            end=end_date,
+            limit=limit,
+            query_variables=query_variables,
+        )
+        result_list = []
+        async for post in results:
+            result_list.append(post)
+
+    return result_list
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--config_path", type=str, help="json of search configs")
@@ -137,8 +183,9 @@ if __name__ == "__main__":
         help="Optional, directory and file name where to save output",
     )
     opts = parser.parse_args()
+    print(opts.config_path)
     with open(opts.config_path) as fb:
-        config = json.loads(fb)
+        config = json.load(fb)
     search_id = config["search_id"]
     start_date = config["start_date"]
     end_date = config["end_date"]
@@ -148,24 +195,10 @@ if __name__ == "__main__":
         output_path = opts.output_path
     else:
         output_path = f'{search_id}_{datetime.now().strftime("%Y_%m_%d_%H_%M_%S")}.csv'
-    transport = AIOHTTPTransport(
-        url=PULSAR_URL, headers={"Authorization": "Bearer {}".format(PULSAR_API)}
+
+    result_list = asyncio.run(
+        client(search_id, start_date, end_date, query_variables, limit)
     )
-    async with Client(
-        transport=transport,
-        fetch_schema_from_transport=False,
-    ) as session:
-        pulsar_client = PulsarClient(session=session)
-        results = pulsar_client.get_posts(
-            search_id=search_id,
-            start=start_date,
-            end=end_date,
-            limit=100,
-            query_variables=query_variables,
-        )
-        result_list = []
-        async for post in results:
-            result_list.append(post)
 
     result_df = pd.DataFrame(result_list)
-    result_list.to_csv(output_path, index=False)
+    result_df.to_csv(output_path, index=False)
