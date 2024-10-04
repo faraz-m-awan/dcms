@@ -1,0 +1,5 @@
+black==23.11.0
+isort==5.13.0
+jupyter-contrib-nbextensions==0.7.0
+notebook==6.4.12
+pre-commit>=3.5.0

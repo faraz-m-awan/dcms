@@ -1,4 +1,4 @@
-exclude: '^(build|docs)'
+exclude: '^(build|docs|eventclf)'
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -13,7 +13,7 @@ repos:
       - id: check-toml
       - id: debug-statements
       - id: end-of-file-fixer
-      - id: detect-aws-credentials
+        exclude: .*\.json
 
   - repo: https://github.com/ambv/black
     rev: 23.11.0
@@ -23,9 +23,9 @@ repos:
   - repo: http://github.com/timothycrosley/isort
     rev: 5.13.0
     hooks:
-    - id: isort
-      additional_dependencies: ["toml"]
-      args: ["--profile", "black", "--filter-files"]
+      - id: isort
+        additional_dependencies: ["toml"]
+        args: ["--profile", "black", "--filter-files"]
 
   - repo: https://github.com/pycqa/flake8
     rev: 6.1.0
@@ -33,7 +33,11 @@ repos:
       - id: flake8
         args: ["--max-line-length=88", '--ignore=E203,E501,W503']
 
-  - repo: https://github.com/kynan/nbstripout
-    rev: 0.6.1
+  - repo: local
     hooks:
-      - id: nbstripout
+      - id: jupyter-nb-clear-output
+        name: jupyter-nb-clear-output
+        files: \.ipynb$
+        stages: [commit]
+        language: system
+        entry: jupyter nbconvert --ClearOutputPreprocessor.enabled=True --inplace
