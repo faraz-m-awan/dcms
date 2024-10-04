@@ -1,35 +1,38 @@
-from utils import PermittedAlgorithms, obfuscate_text, check_query_variables
-import pandas as pd
+import argparse
+import asyncio
+import json
+import math
 import os
 from datetime import datetime
-import asyncio
-from gql import gql, Client
-from gql.client import AsyncClientSession
-from loguru import logger
-from dotenv import load_dotenv
-from gql.transport.aiohttp import AIOHTTPTransport
-import math
-import json
 from typing import Generator
-import argparse
+
+import pandas as pd
+from dotenv import load_dotenv
+from gql import Client, gql
+from gql.client import AsyncClientSession
+from gql.transport.aiohttp import AIOHTTPTransport
+from loguru import logger
+from utils import (
+    PermittedAlgorithms,
+    check_query_variables,
+    obfuscate_tagged_users,
+    obfuscate_text,
+)
 
 load_dotenv()
 
 PULSAR_URL = "https://data.pulsarplatform.com/graphql/trac"
 PULSAR_API = os.environ.get("PULSAR_API_KEY")
 
+
 class PulsarClient:
     _session: AsyncClientSession
-    
+
     def __init__(self, session: AsyncClientSession):
         self._session = session
-   
+
     async def get_posts(
-        search_id: str,
-        start: str, 
-        end: str, 
-        limit: int,
-        query_variables: str
+        self, search_id: str, start: str, end: str, limit: int, query_variables: str
     ) -> Generator:
         """Gets posts for a given pulser searhc id
 
@@ -49,7 +52,7 @@ class PulsarClient:
         Yields
         ------
         Generator
-        dictionary of returned posts from search 
+        dictionary of returned posts from search
         """
         cursor = None
         fetched_pages = 0
@@ -66,7 +69,9 @@ class PulsarClient:
                             {
                                 total
                                 nextCursor
-                                results {""" + query_variables + """
+                                results {"""
+                    + query_variables
+                    + """
                                     }
                                 }
                             }
@@ -94,11 +99,11 @@ class PulsarClient:
                 for p in result["results"]["results"]:
                     total_filtered_post_count += 1
                     try:
-                        p['userScreenName'] = obfuscate_text(
-                                p['userScreenName'],
-                                algorithm=PermittedAlgorithms.sha256,
-                            )
-                        p["content"] = obfuscate_tagged_users(text = p["content"])
+                        p["userScreenName"] = obfuscate_text(
+                            p["userScreenName"],
+                            algorithm=PermittedAlgorithms.sha256,
+                        )
+                        p["content"] = obfuscate_tagged_users(text=p["content"])
 
                         yield p
                     except Exception as e:
@@ -125,36 +130,42 @@ class PulsarClient:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--config_path",type=str,help="json of search configs")
-    parser.add_argument("--output_path",type=str,help="Optional, directory and file name where to save output")
+    parser.add_argument("--config_path", type=str, help="json of search configs")
+    parser.add_argument(
+        "--output_path",
+        type=str,
+        help="Optional, directory and file name where to save output",
+    )
     opts = parser.parse_args()
     with open(opts.config_path) as fb:
         config = json.loads(fb)
-    search_id = config['search_id']
-    start_date = config['start_date']
-    end_date = config['end_date']
-    limit = config['limit']
-    query_variables = check_query_variables(config['query_variables'])
-    if opts.output_path: 
+    search_id = config["search_id"]
+    start_date = config["start_date"]
+    end_date = config["end_date"]
+    limit = config["limit"]
+    query_variables = check_query_variables(config["query_variables"])
+    if opts.output_path:
         output_path = opts.output_path
     else:
-        output_path = f"{search_id}_{datetime.now().strftime("%Y_%m_%d_%H_%M_%S")}.csv"
+        output_path = f'{search_id}_{datetime.now().strftime("%Y_%m_%d_%H_%M_%S")}.csv'
     transport = AIOHTTPTransport(
         url=PULSAR_URL, headers={"Authorization": "Bearer {}".format(PULSAR_API)}
     )
-    async with Client(transport = transport, fetch_schema_from_transport=False,) as session: 
+    async with Client(
+        transport=transport,
+        fetch_schema_from_transport=False,
+    ) as session:
         pulsar_client = PulsarClient(session=session)
         results = pulsar_client.get_posts(
-            search_id = search_id,
-            start = start_date, 
-            end =  end_date, 
-            limit =  100,
-            query_variables=query_variables
+            search_id=search_id,
+            start=start_date,
+            end=end_date,
+            limit=100,
+            query_variables=query_variables,
         )
         result_list = []
-        async for post in results: 
+        async for post in results:
             result_list.append(post)
-    
+
     result_df = pd.DataFrame(result_list)
-    result_list.to_csv(output_path,index=False)
-        
+    result_list.to_csv(output_path, index=False)
