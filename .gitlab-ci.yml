@@ -20,7 +20,7 @@ linting:
     - pip install pre-commit==3.5.0
     - pip install jupyter_contrib_nbextensions
     - pip install notebook==6.4.12
-    - pre-commit run pipelines/. notebooks/. strava/.
+    - pre-commit run --all-files
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
     - when: always
