@@ -1,8 +1,6 @@
 stages:
   - lint
-  - test
-  - deploy
-  - docs
+
 
 # Change pip's cache directory to be inside the project directory since we can
 # only cache local items.
@@ -15,11 +13,15 @@ cache:
   paths:
     - .cache/pip
 
-# Pipelines are templated for ease of maintenance. Originall from:
-# https://gitlab.com/facultyai/templates/ci-templates
-# Copied locally to enable pushing from non-faculty accounts.
-include:
-  - local: 'ci-templates/python-lint.yaml'
-  - local: 'ci-templates/python-test.yaml'
-  - local: 'ci-templates/python-package.yaml'
-  - local: 'ci-templates/python-pages.yaml'
+linting:
+  stage: lint
+  image: python:3.9.15
+  script:
+    - pip install pre-commit==3.5.0
+    - pip install jupyter_contrib_nbextensions
+    - pip install notebook==6.4.12
+    - pre-commit run --all-files
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - when: always
+  needs: []
