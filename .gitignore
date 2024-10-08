@@ -52,7 +52,7 @@ cover/*
 
 # exclude data from source control by default
 data/
-
+pipelines/pulsar/pulsar_configs/
 # Mac OS-specific storage files
 .DS_Store
 

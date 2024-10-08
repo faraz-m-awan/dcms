@@ -7,6 +7,7 @@ from datetime import datetime
 from typing import Generator, List
 
 import pandas as pd
+from clean_pulsar_data import clean_data
 from dotenv import load_dotenv
 from gql import Client, gql
 from gql.client import AsyncClientSession
@@ -182,7 +183,15 @@ if __name__ == "__main__":
         type=str,
         help="Optional, directory and file name where to save output",
     )
+    parser.add_argumnet(
+        "--white_list_path", type=str, help="Optional, path to whitelist csv"
+    )
+    parser.add_argument(
+        "--clean_data_path", type=str, help="Optional, directory to put clean data"
+    )
+
     opts = parser.parse_args()
+
     print(opts.config_path)
     with open(opts.config_path) as fb:
         config = json.load(fb)
@@ -202,3 +211,10 @@ if __name__ == "__main__":
 
     result_df = pd.DataFrame(result_list)
     result_df.to_csv(output_path, index=False)
+    if opts.clean_data_path:
+        if opts.white_list_path:
+            whitelist = pd.read(opts.white_list_path)
+        else:
+            whitelist = None
+        cleaned_data = clean_data(result_df, whitelist)
+        cleaned_data.to_csv(opts.clean_data_path)
