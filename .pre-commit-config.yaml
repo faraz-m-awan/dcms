@@ -1,4 +1,4 @@
-exclude: '^(build|docs|eventclf)'
+exclude: '^(build|docs|eventclf/eventclf/v1|eventclf/build)'
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks

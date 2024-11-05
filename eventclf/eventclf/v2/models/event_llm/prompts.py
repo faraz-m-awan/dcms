@@ -1,9 +1,8 @@
-
 ABOUT_EVENT_TEMPLATE = """
-You are a classifier used to determine the relevance of a social media post to a specified event. 
+You are a classifier used to determine the relevance of a social media post to a specified event.
 Your task is to analyze each post and classify whether it is about the given event or not.
 
-Your task is to classify social media posts to ascertain whether they are about {event}. 
+Your task is to classify social media posts to ascertain whether they are about {event}.
 
 {event} is {event_description}
 
@@ -20,10 +19,10 @@ Response:
 """
 
 EVENT_ATTENTENCE_TEMPLATE = """
-You are a classifier used to classify social media posts related to event attendence. 
+You are a classifier used to classify social media posts related to event attendence.
 Your task is to determine whether a social media posts suggests that the author or another person attended a particular event.
 
-Your task is to classify social media posts to ascertain whether the author of the post attended {event}. 
+Your task is to classify social media posts to ascertain whether the author of the post attended {event}.
 
 {event} is {event_description}
 

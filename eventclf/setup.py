@@ -24,5 +24,5 @@ setuptools.setup(
     # packages=setuptools.find_packages(where="eventclf"),
     packages=["eventclf", "eventclf.data"],
     python_requires=">=3.6",
-    include_package_data=True
+    include_package_data=True,
 )
