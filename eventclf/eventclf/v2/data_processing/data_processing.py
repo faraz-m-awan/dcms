@@ -49,7 +49,7 @@ def _clean_text(text: str, remove_words: List[str]) -> str:
     """
     cleaned_text = re.sub("\@\S{40}", "@UserHandle ", text)  # noqa W605
     for word in remove_words:
-        cleaned_text = cleaned_text.replace(word, "")
+        cleaned_text = cleaned_text.replace(word, "event")
     return cleaned_text
 
 

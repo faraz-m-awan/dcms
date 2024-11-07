@@ -1,3 +1,4 @@
+import os
 from enum import Enum
 from typing import Dict, List, Union
 
@@ -21,20 +22,28 @@ class EventLLM:
         model: LLMModels = LLMModels.llama_3_2_1b_instruct,
         batch_size: int = 10,
         device: Union[str, torch.device] = "cpu",
+        access_token: str = os.environ["HF_API_KEY"],
     ):
         """Initilisatises LLM approach for event summary model
 
         Parameters
         ----------
+
         model : LLMModels, optional
             Model to use, by default LLMModels.llama_3_2_1b_instruct
         batch_size : int, optional
             number of posts in a batch, by default 10
         device : Union[str,torch.device], optional
             device to use, either GPU or CPU, by default "cpu"
+        access_token: str
+            api token to access Llama models on HF
         """
         self._pipe = pipeline(
-            "text-generation", model=model, device=device, batch_size=batch_size
+            "text-generation",
+            model=model,
+            device=device,
+            batch_size=batch_size,
+            access_token=access_token,
         )
         self._pipe.tokenizer.pad_token_id = self._pipe.tokenizer.eos_token_id
         self._terminators = [
