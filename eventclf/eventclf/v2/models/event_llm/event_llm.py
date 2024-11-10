@@ -1,4 +1,3 @@
-import os
 from enum import Enum
 from typing import Dict, List, Union
 
@@ -19,10 +18,10 @@ class LLMModels(str, Enum):
 class EventLLM:
     def __init__(
         self,
+        access_token: str,
         model: LLMModels = LLMModels.llama_3_2_1b_instruct,
         batch_size: int = 10,
         device: Union[str, torch.device] = "cpu",
-        access_token: str = os.environ["HF_API_KEY"],
     ):
         """Initilisatises LLM approach for event summary model
 
@@ -41,9 +40,12 @@ class EventLLM:
         self._pipe = pipeline(
             "text-generation",
             model=model,
-            device=device,
+            device_map="auto",
             batch_size=batch_size,
-            access_token=access_token,
+            model_kwargs={
+                "torch_dtype": torch.float16,
+            }
+            #            access_token=access_token,
         )
         self._pipe.tokenizer.pad_token_id = self._pipe.tokenizer.eos_token_id
         self._terminators = [
@@ -51,9 +53,10 @@ class EventLLM:
             self._pipe.tokenizer.convert_tokens_to_ids("<|eot_id|>"),
         ]
         self._pipe.model.generation_config.force_words_ids = [[9642, 2822]]
+        self._pipe.tokenizer.padding_side = "left"
 
     def _format_prompt(
-        self, prompt_template: str, prompt_inputs: Dict[str], posts: List[str]
+        self, prompt_template: str, prompt_inputs: Dict[str, str], posts: List[str]
     ) -> List[str]:
         """Takes prompt template, additional inputs and posts and formats them to usable input for
         an LLM
@@ -73,7 +76,7 @@ class EventLLM:
             list of prompt inputs for input to an LLM
         """
         prompt = prompt_template
-        for input_key, input_text in prompt_inputs.values():
+        for input_key, input_text in prompt_inputs.items():
             regex = "{" + input_key + "}"
             prompt = prompt.replace(regex, input_text)
         prompt_list = [prompt.replace("{post}", post) for post in posts]
@@ -82,7 +85,7 @@ class EventLLM:
     def predict(
         self,
         prompt_template: str,
-        prompt_inputs: Dict[str],
+        prompt_inputs: Dict[str, str],
         posts: List[str],
         temperature: float = 0.1,
         max_new_tokens: int = 1,
@@ -117,6 +120,7 @@ class EventLLM:
             eos_token_id=self._terminators,
         )
         cleaned_output = []
+        self._out = []
         for prompt, responce in zip(prompt_list, output):
             out = responce[0]["generated_text"][len(prompt) :]
             if "yes" in out.lower():
@@ -125,4 +129,5 @@ class EventLLM:
                 cleaned_output.append(0)
             else:
                 cleaned_output.append(np.NaN)
-        return output
+            self._out.append(out)
+        return cleaned_output

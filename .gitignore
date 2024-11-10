@@ -58,3 +58,7 @@ pipelines/pulsar/pulsar_configs/
 
 # secret
 .secret
+
+# data
+.csv
+.json
