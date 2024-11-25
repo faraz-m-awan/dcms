@@ -20,7 +20,7 @@ class EventGradientBoostingClassifier:
     def _vectorise(self, text: pd.Series) -> np.array:
         bow = self._vect_bow.transform(text)
         w2v = self._vect_w2v.transform(text)
-        return np.concatenate((bow, w2v), axis=1)
+        return np.concatenate((bow.todense(), w2v), axis=1)
 
     def _tranform_input(self, df: pd.DataFrame) -> np.array:
         word_vectors = self._vectorise(df[self._text_column])
@@ -32,9 +32,9 @@ class EventGradientBoostingClassifier:
     def fit(self, x: pd.DataFrame, y: pd.Series, text_column: str = "tweet.text"):
         self._text_column = text_column
         self._vect_bow.fit(x[self._text_column])
-        x_transformed = self._tranform_input(x, text_column)
+        x_transformed = self._tranform_input(x)
         self._model.fit(x_transformed, y)
 
-    def predict(self, x: pd.DataFrame, text_column) -> np.array:
-        x_transformed = self._tranform_input(x, text_column)
-        return self._model(x_transformed)
+    def predict(self, x: pd.DataFrame) -> np.array:
+        x_transformed = self._tranform_input(x)
+        return self._model.predict(x_transformed)

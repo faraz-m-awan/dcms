@@ -1,7 +1,7 @@
 import re
 from ast import literal_eval
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 
 import numpy as np
 import pandas as pd
@@ -14,7 +14,6 @@ emotre = re.compile(
 
 all_feats = [
     "tweet.text",
-    "num.user_mentions",
     "num.urls",
     "num.hashtags",
     "num.emoticons",
@@ -32,7 +31,7 @@ all_feats = [
 imp = SimpleImputer(missing_values=np.nan, strategy="mean")
 
 
-def _clean_text(text: str, remove_words: List[str]) -> str:
+def _clean_text(text: str, remove_words: Optional[List[str]] = None) -> str:
     """cleans social media post of user hashes and unwanted words
 
     Parameters
@@ -48,8 +47,9 @@ def _clean_text(text: str, remove_words: List[str]) -> str:
         cleaned string
     """
     cleaned_text = re.sub("\@\S{40}", "@UserHandle ", text)  # noqa W605
-    for word in remove_words:
-        cleaned_text = cleaned_text.replace(word, "event")
+    if remove_words:
+        for word in remove_words:
+            cleaned_text = cleaned_text.replace(word, "event")
     return cleaned_text
 
 

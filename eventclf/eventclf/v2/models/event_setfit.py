@@ -8,7 +8,12 @@ from setfit import SetFitModel, Trainer, sample_dataset
 
 
 class EventSetfit:
-    def __init__(self, model: str, device: Union[str, torch.device] = "cpu"):
+    def __init__(
+        self,
+        model: str,
+        device: Union[str, torch.device] = "cpu",
+        load_model: bool = False,
+    ):
         """Inititalises event setfit model
 
         Parameters
@@ -19,8 +24,9 @@ class EventSetfit:
             device to run model on, by default "cpu"
         """
         self._model_id = model
-        self._model = SetFitModel.from_pretrained(self._model_id)
-        self._model.to(device)
+        if load_model:
+            self._model = SetFitModel.from_pretrained(model)
+            self._model.to(device)
 
     def fit(
         self,
@@ -30,6 +36,7 @@ class EventSetfit:
         text_column: str,
         training_sample_size: int,
         hp_space: Callable,
+        n_trials: int = 10,
     ):
         """Performs hyperparameter search and finetuning of setfit model
 
@@ -67,20 +74,22 @@ class EventSetfit:
         )
         test_dataset = Dataset.from_pandas(validation_df)
         trainer = Trainer(
-            model=self._model,
             train_dataset=train_dataset,
             eval_dataset=test_dataset,
             model_init=model_init,
             column_mapping={
-                "text_column_name": text_column,
-                "label_column_name": label_column,
+                text_column: "text",
+                label_column: "label",
             },
         )
+
         best_run = trainer.hyperparameter_search(
-            direction="maximize", hp_space=hp_space, n_trials=10
+            direction="minimize", hp_space=hp_space, n_trials=n_trials
         )
-        trainer.apply_hyperparameters(best_run.hyperparameters, final_model=True)
+        self._params = best_run.hyperparameters
+        trainer.apply_hyperparameters(self._params, final_model=True)
         trainer.train()
+        self._model = trainer.model
 
     def predict(self, text: List[str]) -> np.array:
         """Uses trained model to predict label of outut
@@ -95,7 +104,7 @@ class EventSetfit:
         np.array
             binary array of classification
         """
-        return np.array(self._model.predict[text])
+        return np.array(self._model.predict(text))
 
     def save(self, outpath: str):
         """Saves local model
