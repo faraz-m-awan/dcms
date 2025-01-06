@@ -22,7 +22,16 @@ setuptools.setup(
     ],
     # package_dir={"": "eventclf"},
     # packages=setuptools.find_packages(where="eventclf"),
-    packages=["eventclf", "eventclf.data"],
+    packages=["eventclf"],
     python_requires=">=3.6",
     include_package_data=True,
+    install_requires=[
+        "numpy==1.26",
+        "pandas",
+        "nltk",
+        "datasets",
+        "setfit",
+        "transformers",
+        "gensim",
+    ],
 )

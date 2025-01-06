@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Dict, List, Union
+from typing import Dict, List
 
 import numpy as np
 import torch
@@ -18,10 +18,8 @@ class LLMModels(str, Enum):
 class EventLLM:
     def __init__(
         self,
-        access_token: str,
         model: LLMModels = LLMModels.llama_3_2_1b_instruct,
         batch_size: int = 10,
-        device: Union[str, torch.device] = "cpu",
     ):
         """Initilisatises LLM approach for event summary model
 
@@ -32,10 +30,6 @@ class EventLLM:
             Model to use, by default LLMModels.llama_3_2_1b_instruct
         batch_size : int, optional
             number of posts in a batch, by default 10
-        device : Union[str,torch.device], optional
-            device to use, either GPU or CPU, by default "cpu"
-        access_token: str
-            api token to access Llama models on HF
         """
         self._pipe = pipeline(
             "text-generation",
@@ -44,8 +38,7 @@ class EventLLM:
             batch_size=batch_size,
             model_kwargs={
                 "torch_dtype": torch.float16,
-            }
-            #            access_token=access_token,
+            },
         )
         self._pipe.tokenizer.pad_token_id = self._pipe.tokenizer.eos_token_id
         self._terminators = [
@@ -125,9 +118,7 @@ class EventLLM:
             out = responce[0]["generated_text"][len(prompt) :]
             if "yes" in out.lower():
                 cleaned_output.append(1)
-            elif "no" in out.lower():
-                cleaned_output.append(0)
             else:
-                cleaned_output.append(np.NaN)
+                cleaned_output.append(0)
             self._out.append(out)
         return cleaned_output

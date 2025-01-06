@@ -1,5 +1,4 @@
 ABOUT_EVENT_TEMPLATE = """
-You are a classifier used to determine the relevance of a social media post to a specified event.
 Your task is to analyze each post and classify whether it is about the given event or not.
 
 Your task is to classify social media posts to ascertain whether they are about {event}.
@@ -10,8 +9,6 @@ Instructions:
    - Yes: Consider the event description provided. Classify as "Yes" if the social media post explicitly mentions details associated with the event, or if it discusses related themes, keywords, or implications directly linked to the event.
    - No: Classify as "No" if the social media post is not relevant to the event and does not mention or relate to any aspects of the event or if the connection is too vague or generic.
 Return only either "Yes" or "No"
-
-{examples}
 
 {post}
 

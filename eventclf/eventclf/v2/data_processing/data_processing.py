@@ -31,7 +31,7 @@ all_feats = [
 imp = SimpleImputer(missing_values=np.nan, strategy="mean")
 
 
-def _clean_text(text: str, remove_words: Optional[List[str]] = None) -> str:
+def clean_text(text: str, remove_words: Optional[List[str]] = None) -> str:
     """cleans social media post of user hashes and unwanted words
 
     Parameters
@@ -50,7 +50,7 @@ def _clean_text(text: str, remove_words: Optional[List[str]] = None) -> str:
     if remove_words:
         for word in remove_words:
             cleaned_text = cleaned_text.replace(word, "event")
-    return cleaned_text
+    return cleaned_text.encode("ascii", "ignore").decode()
 
 
 def clean_data(
@@ -113,7 +113,7 @@ def clean_data(
         )
     )
     df = df[features]
-    df["tweet.text"] = df["tweet.text"].apply(lambda x: _clean_text(x, remove_words))
+    df["tweet.text"] = df["tweet.text"].apply(lambda x: clean_text(x, remove_words))
     imp_trained = imp.fit(df.drop(columns="tweet.text"))
     imp_out = imp_trained.transform(df.drop(columns="tweet.text"))
     imp_out = pd.DataFrame(imp_out, columns=features[1:])
