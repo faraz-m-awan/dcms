@@ -11,5 +11,5 @@ Code for answering the following RQ:
   from eventclf.evaluate_features import run_feat_analysis
   run_feat_analysis(path_to_results_file)
   ```
-  
+
 Find the results in the results folder.

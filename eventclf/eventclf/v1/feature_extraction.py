@@ -3,7 +3,7 @@ from ast import literal_eval
 import re
 import numpy as np
 from sklearn.impute import SimpleImputer
-from eventclf.preprocessing import rich_analyzer_w2v
+from eventclf.v1.preprocessing import rich_analyzer_w2v
 
 emotre = re.compile(
     r'(:\w+\:|\<[\/\\]?3|[\(\)\\\D|\*\$][\-\^]?[\:\;\=]|[\:\;\=B8][\-\^]?[3DOPp\@\$\*\\\)\(\/\|])(?=\s|[\!\.\?]|$)')

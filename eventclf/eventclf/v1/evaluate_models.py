@@ -1,10 +1,10 @@
 import os
 from datetime import datetime
 import pandas as pd
-from eventclf.attendance_classification import get_dic_models, get_models_evaluation
-from eventclf.preprocessing import rich_analyzer_textual
+from eventclf.v1.attendance_classification import get_dic_models, get_models_evaluation
+from eventclf.v1.preprocessing import rich_analyzer_textual
 from sklearn.feature_extraction.text import CountVectorizer
-from eventclf.w2v_model import MaxEmbeddingVectorizer, SumEmbeddingVectorizer, \
+from eventclf.v1.w2v_model import MaxEmbeddingVectorizer, SumEmbeddingVectorizer, \
     MixEmbeddingVectorizer
 import gensim.downloader
 

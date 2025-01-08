@@ -1,4 +1,6 @@
 gensim==4.1.2
-numpy==1.22.3
+#numpy==1.22.3
 nltk
-sklearn
+datasets
+setfit
+transformers
