@@ -127,9 +127,7 @@ def plot_catchment_map(
     ax = ax.flatten()
     for ind, year in enumerate(years):
         tdf_uk = uk_sf.copy()
-        tdf_site = site_df[site_df["year"] == year][
-            ["site_name", "geo_code", "pct_total"]
-        ]
+        tdf_site = tdf[tdf["year"] == year][["site_name", "geo_code", "pct_total"]]
         tdf_uk = tdf_uk.merge(tdf_site, on="geo_code", how="left")
         tdf_uk["log_pct_total"] = np.log1p(tdf_uk["pct_total"])
 

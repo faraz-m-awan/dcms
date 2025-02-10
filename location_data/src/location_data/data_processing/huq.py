@@ -182,7 +182,7 @@ def process_huq_bayesian(
     return huq_bys_df
 
 
-def get_area(site_shapes_path: Union[str, PosixPath]) -> gpd.DataFrame:
+def get_area(site_shapes_path: Union[str, PosixPath]) -> gpd.GeoDataFrame:
     """Reads in shape files of events and gets area and population density
 
     Parameters
@@ -192,7 +192,7 @@ def get_area(site_shapes_path: Union[str, PosixPath]) -> gpd.DataFrame:
 
     Returns
     -------
-    gpd.DataFrame
+    gpd.GeoDataFrame
         geoDataframe of site names, densitys and areas
     """
     shape_df = gpd.read_file(site_shapes_path)
@@ -277,7 +277,7 @@ def clean_huq_data(
         dataframe of clean huq data
     """
     if data_freq == "Annual":
-        huq_df = process_huq_annual_estimates(huq_daily_estimates_path, years)
+        huq_df = process_huq_annual_estimates(huq_estimates_path, years)
         huq_df["data_freq"] = "annual"
     else:
         huq_df = process_one_day_event_data(huq_estimates_path, dates_of_interest)
