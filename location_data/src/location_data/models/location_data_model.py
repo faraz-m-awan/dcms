@@ -10,19 +10,6 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVR
 from xgboost import XGBRegressor
 
-location_data_base_models = {
-    "linear_model": LinearRegression(),
-    "SVM": SVR(kernel="linear", C=1.5, epsilon=0.001),
-    "random_forest": RandomForestRegressor(n_estimators=100, random_state=42),
-    "xgb_model": XGBRegressor(
-        n_estimators=100,  # Number of trees
-        learning_rate=0.1,  # Step size
-        max_depth=3,  # Maximum depth of a tree
-        objective="reg:squarederror",  # Objective for regression
-        random_state=42,
-    ),
-}
-
 
 class LocationDataModel:
     def __init__(
@@ -53,6 +40,20 @@ class LocationDataModel:
         ValueError
             raises error if svm is loaded without scaler paths
         """
+
+        location_data_base_models = {
+            "linear_model": LinearRegression(),
+            "SVM": SVR(kernel="linear", C=1.5, epsilon=0.001),
+            "random_forest": RandomForestRegressor(n_estimators=100, random_state=42),
+            "xgb_model": XGBRegressor(
+                n_estimators=100,  # Number of trees
+                learning_rate=0.1,  # Step size
+                max_depth=3,  # Maximum depth of a tree
+                objective="reg:squarederror",  # Objective for regression
+                random_state=42,
+            ),
+        }
+
         if model not in location_data_base_models.keys():
             raise ValueError(
                 f"model is not in model types {location_data_base_models.keys()}"
@@ -84,7 +85,7 @@ class LocationDataModel:
                 self.scaler_x = StandardScaler()
                 self.scaler_y = StandardScaler()
 
-    def fit(self, X: Union[pd.series, np.array], y: Union[pd.series, np.array]):
+    def fit(self, X: Union[pd.Series, np.array], y: Union[pd.Series, np.array]):
         """Fits location model
 
         Parameters
@@ -102,7 +103,7 @@ class LocationDataModel:
             y_train = y
         self.model.fit(X_train, y_train)
 
-    def predict(self, X: Union[pd.series, np.array]) -> np.array:
+    def predict(self, X: Union[pd.Series, np.array]) -> np.array:
         """Predicts attendence at events
 
         Parameters
