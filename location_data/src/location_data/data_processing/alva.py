@@ -47,6 +47,7 @@ def clean_alva_data(
     alva_data_path: Union[str, PosixPath],
     rename_sites: Optional[Dict[str, str]] = None,
     excluded_sites: Optional[List[str]] = None,
+    entry_replace_dict: Dict[int, Dict[str, int]]
 ) -> pd.DataFrame:
     """Processes and cleans ALVA ground truth data
 
@@ -58,6 +59,8 @@ def clean_alva_data(
         some sites have inconsistent naming across names, dict for names standardisation, by default None
     excluded_sites : Optional[List[str]], optional
         sites to drop from ALVA data, by default None
+    entry_replace_dict: Dict[int, Dict[str, int]]
+        entry values replacement
 
     Returns
     -------
@@ -104,42 +107,50 @@ def clean_alva_data(
         * 100
     )
 
-    replace_dict_2019 = {"F": 1, "C": 2, "F/C": 3}
-    replace_dict_2020 = {"F": 1, "C": 2, "F/C": 3}
-    replace_dict_2021 = {"1": 1, "2": 3, "3": 3, "4": 2, "1/2/3/4": 3, "01-Apr": 2}
-    replace_dict_2022 = {"1": 1, "2": 3, "3": 3, "4": 3, "5": 2, "1234": 3}
-    replace_dict_2023 = {
-        "1": 1,
-        "2": 3,
-        "3": 3,
-        "4": 3,
-        "5": 3,
-        "6": 2,
-        "Note v": 3,
-        "Note ac": 3,
-        "Note an": 3,
-        "Note y": 3,
-        "1 (Note t)": 3,
-        "Other": 2,
-    }
+    # replace_dict_2019 = {"F": 1, "C": 2, "F/C": 3}
+    # replace_dict_2020 = {"F": 1, "C": 2, "F/C": 3}
+    # replace_dict_2021 = {"1": 1, "2": 3, "3": 3, "4": 2, "1/2/3/4": 3, "01-Apr": 2}
+    # replace_dict_2022 = {"1": 1, "2": 3, "3": 3, "4": 3, "5": 2, "1234": 3}
+    # replace_dict_2023 = {
+    #     "1": 1,
+    #     "2": 3,
+    #     "3": 3,
+    #     "4": 3,
+    #     "5": 3,
+    #     "6": 2,
+    #     "Note v": 3,
+    #     "Note ac": 3,
+    #     "Note an": 3,
+    #     "Note y": 3,
+    #     "1 (Note t)": 3,
+    #     "Other": 2,
+    # }
 
-    gt_df.loc[gt_df["year"] == 2019, "entry"] = gt_df.loc[
-        gt_df["year"] == 2019, "entry"
-    ].replace(replace_dict_2019)
-    gt_df.loc[gt_df["year"] == 2020, "entry"] = gt_df.loc[
-        gt_df["year"] == 2020, "entry"
-    ].replace(replace_dict_2020)
-    gt_df.loc[gt_df["year"] == 2021, "entry"] = gt_df.loc[
-        gt_df["year"] == 2021, "entry"
-    ].replace(replace_dict_2021)
-    gt_df.loc[gt_df["year"] == 2022, "entry"] = gt_df.loc[
-        gt_df["year"] == 2022, "entry"
-    ].replace(replace_dict_2022)
-    gt_df.loc[gt_df["year"] == 2023, "entry"] = gt_df.loc[
-        gt_df["year"] == 2023, "entry"
-    ].replace(replace_dict_2023)
+    # gt_df.loc[gt_df["year"] == 2019, "entry"] = gt_df.loc[
+    #     gt_df["year"] == 2019, "entry"
+    # ].replace(replace_dict_2019)
+    # gt_df.loc[gt_df["year"] == 2020, "entry"] = gt_df.loc[
+    #     gt_df["year"] == 2020, "entry"
+    # ].replace(replace_dict_2020)
+    # gt_df.loc[gt_df["year"] == 2021, "entry"] = gt_df.loc[
+    #     gt_df["year"] == 2021, "entry"
+    # ].replace(replace_dict_2021)
+    # gt_df.loc[gt_df["year"] == 2022, "entry"] = gt_df.loc[
+    #     gt_df["year"] == 2022, "entry"
+    # ].replace(replace_dict_2022)
+    # gt_df.loc[gt_df["year"] == 2023, "entry"] = gt_df.loc[
+    #     gt_df["year"] == 2023, "entry"
+    # ].replace(replace_dict_2023)
 
-    gt_df = gt_df.drop(columns=["group", "note"])
+    for year, replace_dict in entry_replace_dict.items():
+        gt_df.loc[gt_df["year"] == year, "entry"] = gt_df.loc[
+            gt_df["year"] == year, "entry"
+        ].replace(replace_dict)
+
+    # gt_df = gt_df.drop(columns=["group", "note"])
+    columns_to_drop = ["group", "note"] # Dropping these columns if they exist
+    gt_df = gt_df.drop(columns=[col for col in columns_to_drop if col in gt_df.columns])
+
     # gt_df['location_type'] = gt_df['location_type'].fillna('NA')
     mode_location_type = gt_df.groupby("site_name")["location_type"].agg(
         lambda x: x.mode().iloc[0] if not x.mode().empty else None
