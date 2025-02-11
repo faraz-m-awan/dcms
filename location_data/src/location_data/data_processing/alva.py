@@ -47,7 +47,7 @@ def clean_alva_data(
     alva_data_path: Union[str, PosixPath],
     rename_sites: Optional[Dict[str, str]] = None,
     excluded_sites: Optional[List[str]] = None,
-    entry_replace_dict: Dict[int, Dict[str, int]] = None
+    entry_replace_dict: Dict[int, Dict[str, int]] = None,
 ) -> pd.DataFrame:
     """Processes and cleans ALVA ground truth data
 
@@ -148,7 +148,7 @@ def clean_alva_data(
         ].replace(replace_dict)
 
     # gt_df = gt_df.drop(columns=["group", "note"])
-    columns_to_drop = ["group", "note"] # Dropping these columns if they exist
+    columns_to_drop = ["group", "note"]  # Dropping these columns if they exist
     gt_df = gt_df.drop(columns=[col for col in columns_to_drop if col in gt_df.columns])
 
     # gt_df['location_type'] = gt_df['location_type'].fillna('NA')
