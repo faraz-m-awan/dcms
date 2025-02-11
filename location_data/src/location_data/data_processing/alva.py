@@ -47,7 +47,7 @@ def clean_alva_data(
     alva_data_path: Union[str, PosixPath],
     rename_sites: Optional[Dict[str, str]] = None,
     excluded_sites: Optional[List[str]] = None,
-    entry_replace_dict: Dict[int, Dict[str, int]]
+    entry_replace_dict: Dict[int, Dict[str, int]] = None
 ) -> pd.DataFrame:
     """Processes and cleans ALVA ground truth data
 
