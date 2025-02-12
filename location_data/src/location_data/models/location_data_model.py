@@ -15,9 +15,9 @@ class LocationDataModel:
     def __init__(
         self,
         model: Literal["linear_model", "SVM", "random_forest", "xgb_model"],
-        load_path: Optional[str],
-        scaler_path_x: Optional[str],
-        scaler_path_y: Optional[str],
+        load_path: Optional[str] = None,
+        scaler_path_x: Optional[str] = None,
+        scaler_path_y: Optional[str] = None,
     ):
         """Initialises LocationDataModel based on models tested in initial analysis.
         Predicts attendence at events or sites based on Huq Data
