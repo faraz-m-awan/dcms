@@ -42,12 +42,62 @@ RENAME_SITES = {
     "Burns Birthplace Museum": "Robert Burns Birthplace Museum",
 }
 
+SITES_EXCLUDED_GT = [
+    "Longleat",
+    "Scottish National Gallery of Modern Art",
+    "Scottish National Gallery",
+    "Dunfermline Palace",
+    "Fountains Abbey Estate",
+    "Fountains Abbey and Studley Royal Water Garden",
+    "National Railway Museum",
+    "Cliveden",
+    "Croom",
+    "Culzean Castle & Country Park",
+    "Dunfermline Abbey",
+    "Dunfermline Palace",
+    "Knowsley Safari and Knowsley Hall",
+    "Dalby Forest",
+    "Kenwood",
+    "Osborne",
+    "Shugborough Estate",
+    "Stourhead",
+    "Stowe Gardens and Park",
+    "Tyntesfield",
+    "Wallington",
+    "SS Great Britain",
+    "Wimpole Estate",
+    "National Museum Royal Navy",
+    "Ulster Folk & Transport Museum",
+]
+
+# Define the replacement dictionary
+DEFAULT_ENTRY_REPL_DICT = {
+    2019: {"F": 1, "C": 2, "F/C": 3},
+    2020: {"F": 1, "C": 2, "F/C": 3},
+    2021: {"1": 1, "2": 3, "3": 3, "4": 2, "1/2/3/4": 3, "01-Apr": 2},
+    2022: {"1": 1, "2": 3, "3": 3, "4": 3, "5": 2, "1234": 3},
+    2023: {
+        "1": 1,
+        "2": 3,
+        "3": 3,
+        "4": 3,
+        "5": 3,
+        "6": 2,
+        "Note v": 3,
+        "Note ac": 3,
+        "Note an": 3,
+        "Note y": 3,
+        "1 (Note t)": 3,
+        "Other": 2,
+    },
+}
+
 
 def clean_alva_data(
     alva_data_path: Union[str, PosixPath],
-    rename_sites: Optional[Dict[str, str]] = None,
-    excluded_sites: Optional[List[str]] = None,
-    entry_replace_dict: Dict[int, Dict[str, int]] = None,
+    rename_sites: Optional[Dict[str, str]] = RENAME_SITES,
+    excluded_sites: Optional[List[str]] = SITES_EXCLUDED_GT,
+    entry_replace_dict: Dict[int, Dict[str, int]] = DEFAULT_ENTRY_REPL_DICT,
 ) -> pd.DataFrame:
     """Processes and cleans ALVA ground truth data
 
