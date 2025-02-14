@@ -129,7 +129,7 @@ def get_matched_sites(
             .map(manual_site_matches)
             .combine_first(match_df["best_match"])
         )
-    match_df = match_df[["sf_site", "best_match"]]
+    # match_df = match_df[["sf_site", "best_match"]]
     return match_df
 
 

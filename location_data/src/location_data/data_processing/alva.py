@@ -131,7 +131,6 @@ def clean_alva_data(
             "Year": "year",
         }
     )
-
     # Some of the sites in ALVA data don't have same name (format) as the name of the sites in shape file. So, for consistency renaming the sites in ALVA data.
     if rename_sites:
         gt_df["site_name"] = gt_df["site_name"].replace(rename_sites)

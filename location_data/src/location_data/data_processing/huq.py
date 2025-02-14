@@ -249,8 +249,9 @@ def clean_huq_data(
     huq_bayesian_data_path: Union[str, PosixPath],
     sites_shape_path: Union[str, PosixPath],
     data_freq: str = "Annual",
-    years: Optional[Tuple[int]] = None,
+    years: Optional[Tuple[int]] = (2019, 2023),
     dates_of_interest: Optional[Dict[str, str]] = None,
+    excluded_sites: Optional[list] = None,
 ) -> pd.DataFrame:
     """Processes all Huq data
 
@@ -316,4 +317,20 @@ def clean_huq_data(
     if huq_df.duplicated(subset=["site_name", "year"]).any() is False:
         print("duplicated sites found dropping duplicates")
         huq_df = huq_df.drop_duplicates(subset=["site_name", "year"])
+
+    # Deleting sites that are ambigous or whose match was not found in Ground Truth Data
+    if excluded_sites:
+        huq_df = huq_df[~huq_df["site_name"].isin(excluded_sites)]
+
+    # Deleting sites which don't contain the feature set values available
+    huq_df = huq_df.dropna(
+        subset=[
+            "estimated_actual_footfall_sum",
+            "bayesian_visitation_approximation",
+            "site_area",
+            "pop_density",
+            "visitors_day",
+        ]
+    )
+
     return huq_df
